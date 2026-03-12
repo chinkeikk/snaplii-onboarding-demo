@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Snaplii — Onboarding Growth Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --purple: #5a3fc0;
+    --purple-light: #f0eeff;
+    --purple-mid: #d4c8f8;
+    --dark: #1a1a2e;
+    --gold: #f5c842;
+    --red: #ff3008;
+    --green: #1a8a40;
+    --gray: #f5f5f7;
+    --border: #ebebeb;
+    --text: #1a1a2e;
+    --muted: #888;
+    --font: 'DM Sans', sans-serif;
+  }
+
+  html, body {
+    font-family: var(--font);
+    background: #0f0e1a;
+    min-height: 100vh;
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  /* ===== LAYOUT ===== */
+  .stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 32px 24px 48px;
+  }
+
+  .phones-row {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .phone-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .phone-col-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+  }
+  .phone-col-label .lbl-tag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 3px 12px;
+    border-radius: 20px;
+  }
+  .phone-col-label .lbl-tag.current {
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.4);
+  }
+  .phone-col-label .lbl-tag.new {
+    background: rgba(90,63,192,0.3);
+    color: #a990f5;
+    border: 1px solid rgba(90,63,192,0.4);
+  }
+  .phone-col-label .lbl-sub {
+    font-size: 10px;
+    color: rgba(255,255,255,0.2);
+  }
+
+  .vs-divider {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-top: 100px;
+    gap: 8px;
+    color: rgba(255,255,255,0.15);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    flex-shrink: 0;
+  }
+  .vs-line {
+    width: 1px;
+    height: 60px;
+    background: rgba(255,255,255,0.08);
+  }
+
+  .stage-title {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  .stage-title h1 {
+    font-size: 15px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .stage-title .subtitle {
+    font-size: 11px;
+    color: rgba(255,255,255,0.25);
+    letter-spacing: 1px;
+  }
+
+  /* ===== PHONE FRAME ===== */
+  .phone-frame {
+    width: 320px;
+    height: 660px;
+    background: #fff;
+    border-radius: 44px;
+    border: 3px solid #2a2a3e;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .notch {
+    background: #fff;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    flex-shrink: 0;
+  }
+  .notch-time { font-size: 13px; font-weight: 700; color: var(--dark); }
+  .notch-icons { display: flex; gap: 5px; align-items: center; font-size: 12px; color: var(--dark); }
+
+  /* ===== SCREENS ===== */
+  .screen {
+    display: none;
+    animation: fadeSlide 0.3s ease;
+    background: #fff;
+    flex: 1;
+    overflow: hidden;
+    flex-direction: column;
+  }
+  .screen.active { display: flex; }
+
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateX(16px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  /* ===== PROGRESS ===== */
+  .progress-bar {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 20px;
+    justify-content: center;
+  }
+  .progress-dot {
+    width: 24px; height: 4px; border-radius: 2px;
+    background: rgba(255,255,255,0.15);
+    transition: background 0.3s;
+  }
+  .progress-dot.active { background: var(--purple); }
+  .progress-dot.done { background: rgba(90,63,192,0.5); }
+
+  /* ===== STEP LABELS ===== */
+  .step-labels {
+    display: flex;
+    gap: 0;
+    margin-bottom: 0;
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    padding: 4px;
+    width: 320px;
+  }
+  .step-label {
+    flex: 1;
+    text-align: center;
+    font-size: 10px;
+    color: rgba(255,255,255,0.3);
+    padding: 6px 4px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+  .step-label.active {
+    background: var(--purple);
+    color: #fff;
+  }
+  .step-label.done {
+    color: rgba(255,255,255,0.5);
+  }
+
+  /* ===== HEADER ===== */
+  .app-header {
+    background: linear-gradient(150deg, #e8e4f8, #f0eeff 60%, #fff);
+    padding: 12px 18px 16px;
+  }
+  .app-topbar {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 10px;
+  }
+  .app-greeting { font-size: 20px; font-weight: 800; color: var(--dark); }
+  .balance-chip {
+    display: flex; align-items: center; gap: 5px;
+    background: #fff; border-radius: 20px; padding: 5px 12px;
+    font-size: 13px; font-weight: 700; color: var(--dark);
+    border: 1px solid var(--purple-mid);
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .balance-chip:active { transform: scale(0.97); }
+  .balance-chip .s-dot {
+    width: 16px; height: 16px; background: var(--purple);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 9px; font-weight: 800;
+  }
+  .search-input {
+    background: #fff; border-radius: 22px; padding: 9px 14px;
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px; color: #bbb;
+    border: 1px solid var(--purple-mid);
+    cursor: text;
+  }
+
+  /* ===== CASH SPOTLIGHT CARD ===== */
+  .cash-card {
+    margin: 12px;
+    background: var(--dark);
+    border-radius: 20px;
+    padding: 12px 14px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .cash-card:active { transform: scale(0.98); }
+  .cash-card::before {
+    content: '';
+    position: absolute; top: -30px; right: -30px;
+    width: 110px; height: 110px;
+    background: rgba(90,63,192,0.35);
+    border-radius: 50%;
+  }
+  .cash-card::after {
+    content: '';
+    position: absolute; bottom: -20px; right: 40px;
+    width: 60px; height: 60px;
+    background: rgba(245,200,66,0.12);
+    border-radius: 50%;
+  }
+  .cash-label {
+    font-size: 10px; color: rgba(255,255,255,0.5);
+    text-transform: uppercase; letter-spacing: 1px;
+    margin-bottom: 6px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .cash-label-dot {
+    width: 6px; height: 6px; background: #4ade80; border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  .cash-amount {
+    font-size: 34px; font-weight: 800; color: #fff; line-height: 1;
+    margin-bottom: 4px;
+  }
+  .cash-amount span { font-size: 19px; }
+  .cash-desc { font-size: 11px; color: rgba(255,255,255,0.6); margin-bottom: 10px; line-height: 1.5; }
+  .cash-desc strong { color: var(--gold); }
+  .cash-actions { display: flex; gap: 8px; }
+  .btn-use-now {
+    flex: 1; background: var(--purple); color: #fff;
+    border: none; border-radius: 22px; padding: 10px;
+    font-size: 12px; font-weight: 700; font-family: var(--font);
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .btn-use-now:hover { background: #6b4fd4; }
+  .btn-use-now:active { transform: scale(0.97); }
+  .btn-learn {
+    background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.7);
+    border: none; border-radius: 22px; padding: 10px 14px;
+    font-size: 11px; font-family: var(--font); cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s;
+  }
+  .btn-learn:hover { background: rgba(255,255,255,0.18); }
+
+  /* ===== TRUST STRIP ===== */
+  .trust-strip {
+    display: flex; margin: 0 12px 10px;
+    border: 1px solid var(--border); border-radius: 14px; overflow: hidden;
+    background: #fff;
+  }
+  .trust-item {
+    flex: 1; padding: 8px 4px; text-align: center;
+    border-right: 1px solid var(--border);
+  }
+  .trust-item:last-child { border-right: none; }
+  .trust-num { font-size: 13px; font-weight: 800; color: var(--dark); }
+  .trust-lbl { font-size: 8px; color: var(--muted); line-height: 1.3; }
+
+  /* ===== SECTION HEADER ===== */
+  .sec-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 4px 14px 8px;
+  }
+  .sec-title { font-size: 13px; font-weight: 700; color: var(--dark); }
+  .sec-link { font-size: 11px; color: var(--purple); cursor: pointer; }
+
+  /* ===== BRAND CARDS ===== */
+  .brand-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 0 12px 12px;
+  }
+  .brand-tile {
+    border: 1.5px solid var(--border); border-radius: 14px;
+    overflow: hidden; cursor: pointer;
+    transition: border-color 0.15s, transform 0.15s;
+    background: #fff;
+  }
+  .brand-tile:hover { border-color: var(--purple); transform: translateY(-2px); }
+  .brand-tile:active { transform: scale(0.97); }
+  .brand-tile.featured { border-color: var(--purple); position: relative; }
+  .brand-img {
+    height: 60px; display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 800;
+  }
+  .brand-info { padding: 6px 8px; }
+  .brand-name { font-size: 10px; color: var(--muted); }
+  .brand-earn { font-size: 11px; font-weight: 700; color: var(--dark); }
+  .brand-earn .old { font-size: 9px; color: #ccc; text-decoration: line-through; margin-left: 2px; }
+  .best-deal-tag {
+    position: absolute; top: 6px; right: 6px;
+    background: var(--purple); color: #fff; font-size: 8px;
+    padding: 2px 6px; border-radius: 6px; font-weight: 700;
+  }
+
+  /* ===== BOTTOM NAV ===== */
+  .bottom-nav {
+    display: flex; justify-content: space-around;
+    padding: 10px 0 14px;
+    border-top: 1px solid var(--border);
+    background: #fff;
+    flex-shrink: 0;
+  }
+  .nav-btn {
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    font-size: 9px; color: var(--muted); cursor: pointer;
+    transition: color 0.15s;
+  }
+  .nav-btn.active { color: var(--dark); }
+  .nav-icon { font-size: 18px; }
+
+  /* ===== SCREEN 2: DOORDASH DETAIL ===== */
+  .detail-header {
+    display: flex; align-items: center; justify-content: center;
+    padding: 12px 18px; position: relative; border-bottom: 1px solid var(--border);
+  }
+  .back-btn {
+    position: absolute; left: 16px; font-size: 20px; color: var(--dark);
+    cursor: pointer; width: 32px; height: 32px; display: flex; align-items: center;
+    background: var(--gray); border-radius: 50%; justify-content: center;
+    transition: background 0.15s;
+  }
+  .back-btn:hover { background: var(--border); }
+  .detail-title { font-size: 16px; font-weight: 700; color: var(--dark); }
+
+  .gift-card-visual {
+    margin: 16px auto; width: 220px; height: 130px;
+    background: var(--red); border-radius: 16px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: #fff; position: relative; overflow: hidden;
+  }
+  .gift-card-visual::before {
+    content: ''; position: absolute; right: -20px; top: -20px;
+    width: 80px; height: 80px; background: rgba(255,255,255,0.1); border-radius: 50%;
+  }
+  .gift-card-logo { font-size: 20px; font-weight: 900; letter-spacing: -1px; }
+  .gift-card-value {
+    position: absolute; top: 10px; right: 12px;
+    background: #fff; color: var(--dark); border-radius: 12px;
+    padding: 3px 10px; font-size: 13px; font-weight: 800;
+  }
+
+  .amount-options {
+    padding: 0 14px 12px;
+  }
+  .amount-label { font-size: 12px; font-weight: 700; margin-bottom: 8px; color: var(--dark); }
+  .amount-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .amount-btn {
+    border: 1.5px solid var(--border); border-radius: 12px; padding: 10px 6px;
+    text-align: center; cursor: pointer; background: #fff;
+    transition: all 0.15s;
+  }
+  .amount-btn.selected { border-color: var(--purple); background: var(--purple-light); }
+  .amount-btn .amt { font-size: 15px; font-weight: 800; color: var(--dark); }
+  .amount-btn .back-pct { font-size: 10px; color: var(--purple); font-weight: 600; }
+  .amount-btn .best { font-size: 8px; background: #f5c842; color: var(--dark); border-radius: 4px; padding: 1px 4px; font-weight: 700; margin-bottom: 2px; display: inline-block; }
+
+  .with-cash-banner {
+    margin: 0 12px 12px; background: var(--purple-light);
+    border: 1px solid var(--purple-mid); border-radius: 14px; padding: 12px;
+  }
+  .wcb-row { display: flex; justify-content: space-between; align-items: center; }
+  .wcb-left { font-size: 12px; font-weight: 700; color: var(--dark); display: flex; align-items: center; gap: 6px; }
+  .wcb-right { font-size: 14px; font-weight: 800; color: var(--purple); }
+  .wcb-sub { font-size: 10px; color: var(--purple); margin-top: 3px; }
+
+  .add-cart-btn {
+    margin: 4px 12px 10px; width: calc(100% - 24px);
+    background: var(--dark); color: #fff; border: none; border-radius: 26px;
+    padding: 14px; font-size: 14px; font-weight: 700; font-family: var(--font);
+    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .add-cart-btn:hover { background: #2a2a4e; }
+  .add-cart-btn:active { transform: scale(0.98); }
+  .add-cart-btn .orig { text-decoration: line-through; color: rgba(255,255,255,0.35); font-size: 12px; font-weight: 400; }
+
+  /* ===== SCREEN 3: CHECKOUT ===== */
+  .checkout-card-preview {
+    margin: 12px auto; width: 200px; height: 115px;
+    background: var(--red); border-radius: 14px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: #fff; position: relative; overflow: hidden;
+    box-shadow: 0 8px 24px rgba(255,48,8,0.3);
+  }
+  .checkout-card-preview::before {
+    content: ''; position: absolute; right: -15px; top: -15px;
+    width: 70px; height: 70px; background: rgba(255,255,255,0.1); border-radius: 50%;
+  }
+
+  .payment-section { padding: 8px 14px; }
+  .pay-section-title { font-size: 12px; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
+
+  .pay-option {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 9px 12px; border: 1.5px solid var(--border); border-radius: 12px;
+    margin-bottom: 6px; cursor: pointer; background: #fff;
+    transition: border-color 0.15s;
+  }
+  .pay-option.selected { border-color: var(--purple); background: var(--purple-light); }
+  .pay-option-left { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 500; color: var(--dark); }
+  .pay-icon { font-size: 16px; }
+  .earn-chip {
+    background: #e8f0fe; color: #3a6bc0;
+    font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 6px;
+  }
+  .radio {
+    width: 18px; height: 18px; border: 2px solid var(--purple); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .radio-inner { width: 9px; height: 9px; background: var(--purple); border-radius: 50%; }
+
+  .cash-promo-row {
+    margin: 0 12px 8px; background: #f5f2ff;
+    border: 1.5px solid var(--purple-mid); border-radius: 14px; padding: 10px 12px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .cpr-left {}
+  .cpr-title { font-size: 12px; font-weight: 700; color: var(--dark); display: flex; align-items: center; gap: 6px; }
+  .applied-tag {
+    background: var(--purple); color: #fff; font-size: 8px; font-weight: 700;
+    padding: 2px 6px; border-radius: 4px;
+  }
+  .cpr-sub { font-size: 10px; color: var(--purple); margin-top: 2px; }
+  .cpr-right { display: flex; align-items: center; gap: 8px; }
+  .cpr-value { font-size: 15px; font-weight: 800; color: var(--purple); }
+  .toggle {
+    width: 34px; height: 20px; border-radius: 10px; position: relative;
+    cursor: pointer; transition: background 0.2s;
+    background: var(--purple);
+  }
+  .toggle::after {
+    content: ''; position: absolute; right: 2px; top: 2px;
+    width: 16px; height: 16px; background: #fff; border-radius: 50%;
+    transition: right 0.2s;
+  }
+  .toggle.off { background: #ccc; }
+  .toggle.off::after { right: auto; left: 2px; }
+
+  .order-summary { padding: 0 14px 8px; }
+  .os-title { font-size: 12px; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
+  .os-row {
+    display: flex; justify-content: space-between;
+    font-size: 12px; color: #555; padding: 3px 0;
+  }
+  .os-row.total {
+    font-size: 15px; font-weight: 800; color: var(--dark);
+    border-top: 1px solid var(--border); margin-top: 6px; padding-top: 8px;
+  }
+  .os-row .purple { color: var(--purple); font-weight: 700; }
+  .os-row .green { color: var(--green); font-weight: 700; }
+
+  .earn-preview {
+    margin: 4px 12px 8px; background: var(--dark); border-radius: 12px;
+    padding: 10px 14px; display: flex; align-items: center; justify-content: space-between;
+  }
+  .ep-left { font-size: 11px; color: rgba(255,255,255,0.7); display: flex; align-items: center; gap: 6px; }
+  .ep-dot { width: 7px; height: 7px; background: var(--purple); border-radius: 50%; }
+  .ep-amount { font-size: 18px; font-weight: 800; color: var(--gold); }
+
+  .pay-btn-final {
+    margin: 4px 12px 12px; width: calc(100% - 24px);
+    background: var(--dark); color: #fff; border: none; border-radius: 26px;
+    padding: 14px; font-size: 14px; font-weight: 700; font-family: var(--font);
+    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all 0.15s;
+  }
+  .pay-btn-final:hover { background: #2a2a4e; }
+  .pay-btn-final:active { transform: scale(0.98); }
+  .pay-btn-final .crossed { text-decoration: line-through; color: rgba(255,255,255,0.3); font-size: 12px; font-weight: 400; }
+
+  /* ===== SCREEN 4: SUCCESS ===== */
+  .success-screen {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; padding: 32px 20px; min-height: 600px;
+    text-align: center;
+    background: linear-gradient(160deg, #f0eeff, #fff 50%);
+  }
+  .success-icon {
+    width: 80px; height: 80px; background: var(--purple); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px; margin-bottom: 16px;
+    animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes popIn {
+    from { transform: scale(0); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  .success-title { font-size: 22px; font-weight: 800; color: var(--dark); margin-bottom: 6px; }
+  .success-sub { font-size: 13px; color: var(--muted); margin-bottom: 24px; line-height: 1.6; }
+
+  .success-receipt {
+    background: #fff; border: 1px solid var(--border); border-radius: 20px;
+    padding: 16px; width: 100%; margin-bottom: 20px;
+    text-align: left;
+  }
+  .receipt-row {
+    display: flex; justify-content: space-between; padding: 5px 0;
+    font-size: 12px; border-bottom: 1px solid var(--gray);
+  }
+  .receipt-row:last-child { border-bottom: none; }
+  .receipt-row .label { color: var(--muted); }
+  .receipt-row .val { font-weight: 700; color: var(--dark); }
+  .receipt-row .val.green { color: var(--green); }
+  .receipt-row .val.purple { color: var(--purple); }
+
+  .new-balance-card {
+    background: var(--dark); color: #fff; border-radius: 20px;
+    padding: 16px; width: 100%; margin-bottom: 20px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .nbc-left {}
+  .nbc-label { font-size: 10px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; }
+  .nbc-amount { font-size: 28px; font-weight: 800; color: #fff; }
+  .nbc-earn { font-size: 11px; color: rgba(255,255,255,0.6); margin-top: 2px; }
+  .nbc-earn span { color: var(--gold); font-weight: 700; }
+  .nbc-right { font-size: 40px; }
+
+  .restart-btn {
+    background: var(--purple); color: #fff; border: none; border-radius: 22px;
+    padding: 12px 32px; font-size: 14px; font-weight: 700; font-family: var(--font);
+    cursor: pointer; transition: background 0.15s;
+  }
+  .restart-btn:hover { background: #6b4fd4; }
+
+  /* ===== INFO MODAL ===== */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+    z-index: 100; align-items: flex-end; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-sheet {
+    background: #fff; border-radius: 28px 28px 0 0;
+    padding: 24px; width: 100%; max-width: 500px;
+    animation: slideUp 0.3s ease;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+  .modal-handle {
+    width: 40px; height: 4px; background: var(--border); border-radius: 2px;
+    margin: 0 auto 20px;
+  }
+  .modal-title { font-size: 18px; font-weight: 800; color: var(--dark); margin-bottom: 8px; }
+  .modal-body { font-size: 13px; color: #555; line-height: 1.7; margin-bottom: 16px; }
+  .modal-item {
+    display: flex; gap: 12px; margin-bottom: 14px; align-items: flex-start;
+  }
+  .modal-item-icon {
+    width: 36px; height: 36px; background: var(--purple-light);
+    border-radius: 10px; display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .modal-item-text {}
+  .modal-item-title { font-size: 13px; font-weight: 700; color: var(--dark); }
+  .modal-item-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .modal-close {
+    width: 100%; background: var(--dark); color: #fff; border: none;
+    border-radius: 22px; padding: 13px; font-size: 14px; font-weight: 700;
+    font-family: var(--font); cursor: pointer;
+  }
+
+  /* ===== ANNOTATIONS ===== */
+  .annotation-panel {
+    width: 320px;
+  }
+  .annotation-card {
+    background: rgba(90,63,192,0.12); border: 1px solid rgba(90,63,192,0.25);
+    border-radius: 14px; padding: 12px 14px; margin-bottom: 8px;
+  }
+  .ann-tag {
+    font-size: 9px; font-weight: 700; color: var(--purple);
+    text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .ann-dot { width: 5px; height: 5px; background: var(--purple); border-radius: 50%; }
+  .ann-text { font-size: 11px; color: rgba(255,255,255,0.7); line-height: 1.6; }
+  .ann-text strong { color: rgba(255,255,255,0.95); }
+
+  /* scroll fix */
+  .screen-scroll {
+    max-height: 600px;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .screen-scroll::-webkit-scrollbar { display: none; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="stage-title">
+    <h1>Snaplii · Growth PM Prototype</h1>
+    <div class="subtitle">Onboarding → First Payment Conversion · Current vs New</div>
+  </div>
+
+  <div class="phones-row">
+
+    <!-- LEFT: Current experience -->
+    <div class="phone-col">
+      <div class="phone-col-label">
+        <div class="lbl-tag current">Current experience</div>
+        <div class="lbl-sub">现有用户首页</div>
+      </div>
+
+      <!-- Step labels (current) -->
+      <div class="step-labels" id="stepLabelsCurrent">
+        <div class="step-label active" onclick="goToCurrentScreen(1)">① 首页</div>
+        <div class="step-label" onclick="goToCurrentScreen(2)">② 品牌详情</div>
+        <div class="step-label" onclick="goToCurrentScreen(3)">③ 结账</div>
+      </div>
+
+      <div class="phone-frame">
+        <div class="notch">
+          <span class="notch-time">13:03</span>
+          <div class="notch-icons"><span>▨▨▨</span><span>📶</span><span>🔋</span></div>
+        </div>
+
+        <!-- CURRENT SCREEN 1: Home -->
+        <div class="screen active" id="cscreen1">
+          <div style="flex:1;overflow-y:auto;scrollbar-width:none;">
+            <!-- header -->
+            <div style="background:linear-gradient(150deg,#e8e4f8,#f0eeff 60%,#fff);padding:12px 18px 14px;flex-shrink:0;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                <div style="font-size:20px;font-weight:800;color:#1a1a2e;">Hi</div>
+                <div style="background:#fff;border-radius:20px;padding:5px 12px;font-size:13px;font-weight:700;color:#1a1a2e;border:1px solid #d4c8f8;">$0.00</div>
+              </div>
+              <div style="font-size:11px;color:#888;margin-bottom:10px;">Shop and earn instant cashback!</div>
+              <div style="background:#fff;border-radius:22px;padding:9px 14px;display:flex;align-items:center;gap:8px;font-size:12px;color:#bbb;border:1px solid #d4c8f8;">
+                🔍 <span>Search from over 300 top brands</span>
+              </div>
+              <div style="font-size:10px;color:#5a3fc0;margin-top:8px;text-decoration:underline;">New! Fantuan Delivery, 7% back every bite</div>
+            </div>
+            <!-- promo banner -->
+            <div style="margin:10px 12px;background:#3a2fc0;border-radius:14px;padding:14px;color:#fff;flex-shrink:0;cursor:pointer;" onclick="goToCurrentScreen(2)">
+              <div style="background:rgba(255,255,255,0.2);display:inline-block;border-radius:8px;padding:2px 8px;font-size:9px;margin-bottom:7px;font-weight:700;">NEW USER ONLY!</div>
+              <div style="font-size:16px;font-weight:900;line-height:1.25;">BUY A <span style="color:#f5c842;">$30</span> GIFT CARD<br>FOR <span style="color:#f5c842;">$20.</span></div>
+              <div style="font-size:9px;opacity:0.7;margin-top:4px;">*SAVE $10 ON ORDERS OF $30+</div>
+            </div>
+            <!-- tabs -->
+            <div style="display:flex;border-bottom:1px solid #f0f0f0;padding:0 12px;flex-shrink:0;">
+              <div style="font-size:11px;font-weight:700;color:#1a1a2e;padding:8px 10px;border-bottom:2px solid #1a1a2e;">Trending Now</div>
+              <div style="font-size:11px;color:#aaa;padding:8px 10px;">🔥 Deal Zone</div>
+              <div style="font-size:11px;color:#aaa;padding:8px 10px;">Restaurants</div>
+            </div>
+            <!-- brand grid -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px 12px;">
+              <div style="border:1px solid #f0f0f0;border-radius:12px;overflow:hidden;cursor:pointer;" onclick="goToCurrentScreen(2)">
+                <div style="height:58px;background:#f5f5f5;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#0f5bab;">⛽ Chevron</div>
+                <div style="padding:5px 8px;"><div style="font-size:10px;color:#888;">Chevron</div><div style="font-size:11px;font-weight:700;">Earn 5%</div></div>
+              </div>
+              <div style="border:1px solid #f0f0f0;border-radius:12px;overflow:hidden;cursor:pointer;" onclick="goToCurrentScreen(2)">
+                <div style="height:58px;background:#ff3008;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;">DOORDASH</div>
+                <div style="padding:5px 8px;"><div style="font-size:10px;color:#888;">DoorDash</div><div style="font-size:11px;font-weight:700;">Earn 7% <span style="font-size:9px;color:#ccc;text-decoration:line-through;">4%</span></div></div>
+              </div>
+              <div style="border:1px solid #f0f0f0;border-radius:12px;overflow:hidden;cursor:pointer;" onclick="goToCurrentScreen(2)">
+                <div style="height:58px;background:#e00;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;">Phillips 66</div>
+                <div style="padding:5px 8px;"><div style="font-size:10px;color:#888;">Phillips 66</div><div style="font-size:11px;font-weight:700;">Earn 5%</div></div>
+              </div>
+              <div style="border:1px solid #f0f0f0;border-radius:12px;overflow:hidden;cursor:pointer;" onclick="goToCurrentScreen(2)">
+                <div style="height:58px;background:#cc0000;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;">TARGET</div>
+                <div style="padding:5px 8px;"><div style="font-size:10px;color:#888;">Target</div><div style="font-size:11px;font-weight:700;">Earn 2.5%</div></div>
+              </div>
+              <div style="border:1px solid #f0f0f0;border-radius:12px;overflow:hidden;cursor:pointer;" onclick="goToCurrentScreen(2)">
+                <div style="height:58px;background:#1da462;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;">UBER EATS</div>
+                <div style="padding:5px 8px;"><div style="font-size:10px;color:#888;">Uber Eats</div><div style="font-size:11px;font-weight:700;">Earn 5%</div></div>
+              </div>
+              <div style="border:1px solid #f0f0f0;border-radius:12px;overflow:hidden;cursor:pointer;" onclick="goToCurrentScreen(2)">
+                <div style="height:58px;background:#f5a623;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;">AMAZON</div>
+                <div style="padding:5px 8px;"><div style="font-size:10px;color:#888;">Amazon</div><div style="font-size:11px;font-weight:700;">Earn 1.5%</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="bottom-nav">
+            <div class="nav-btn active"><div class="nav-icon">🏠</div>Shop</div>
+            <div class="nav-btn"><div class="nav-icon">💳</div>Wallet</div>
+            <div class="nav-btn"><div class="nav-icon">👤</div>Profile</div>
+          </div>
+        </div>
+
+        <!-- CURRENT SCREEN 2: DoorDash detail (old coupon flow) -->
+        <div class="screen" id="cscreen2" style="overflow-y:auto;scrollbar-width:none;">
+          <div class="detail-header">
+            <div class="back-btn" onclick="goToCurrentScreen(1)">‹</div>
+            <div class="detail-title">DoorDash</div>
+          </div>
+          <div class="gift-card-visual">
+            <div class="gift-card-value">$50</div>
+            <div class="gift-card-logo">DOORDASH</div>
+          </div>
+          <div class="amount-options">
+            <div class="amount-label">Select or enter an amount</div>
+            <div class="amount-grid">
+              <div class="amount-btn" onclick="document.querySelectorAll('#cscreen2 .amount-btn').forEach(b=>b.classList.remove('selected'));this.classList.add('selected')">
+                <div class="amt">$20</div><div class="back-pct">4% back</div>
+              </div>
+              <div class="amount-btn" onclick="document.querySelectorAll('#cscreen2 .amount-btn').forEach(b=>b.classList.remove('selected'));this.classList.add('selected')">
+                <div class="amt">$30</div><div class="back-pct">4% back</div>
+              </div>
+              <div class="amount-btn selected" onclick="document.querySelectorAll('#cscreen2 .amount-btn').forEach(b=>b.classList.remove('selected'));this.classList.add('selected')">
+                <div class="best">Best deal</div>
+                <div class="amt">$50</div><div class="back-pct">7% back</div>
+              </div>
+              <div class="amount-btn" onclick="document.querySelectorAll('#cscreen2 .amount-btn').forEach(b=>b.classList.remove('selected'));this.classList.add('selected')">
+                <div class="amt">$100</div><div class="back-pct">7% back</div>
+              </div>
+              <div class="amount-btn" onclick="document.querySelectorAll('#cscreen2 .amount-btn').forEach(b=>b.classList.remove('selected'));this.classList.add('selected')">
+                <div class="amt">$200</div><div class="back-pct">7% back</div>
+              </div>
+              <div class="amount-btn" style="display:flex;align-items:center;justify-content:center;">
+                <div style="font-size:10px;color:var(--muted);">Custom</div>
+              </div>
+            </div>
+          </div>
+          <!-- Old coupon section — no cash banner -->
+          <div style="margin:0 12px 12px;background:#fff3cd;border:1px solid #ffc107;border-radius:14px;padding:12px;">
+            <div style="font-size:11px;font-weight:700;color:#856404;margin-bottom:3px;">🎟 New user coupon applied</div>
+            <div style="font-size:10px;color:#856404;">Buy $30+ and save $10 — one time only</div>
+          </div>
+          <button class="add-cart-btn" onclick="goToCurrentScreen(3)" style="background:#3a2fc0;">
+            Buy for $40.00 <span class="orig">$50</span>
+          </button>
+          <div style="padding:0 14px 16px;text-align:center;font-size:11px;color:var(--muted);line-height:1.6;">
+            ⚡️ Instant delivery · 🔒 Secure · 🎁 Giftable
+          </div>
+        </div>
+
+        <!-- CURRENT SCREEN 3: Checkout (old, no cash balance) -->
+        <div class="screen" id="cscreen3" style="overflow-y:auto;scrollbar-width:none;">
+          <div class="detail-header">
+            <div class="back-btn" onclick="goToCurrentScreen(2)">‹</div>
+            <div class="detail-title">Checkout</div>
+          </div>
+          <div class="checkout-card-preview">
+            <div class="gift-card-value">$50</div>
+            <div class="gift-card-logo" style="font-size:18px;font-weight:900;letter-spacing:-1px;">DOORDASH</div>
+          </div>
+          <div class="payment-section">
+            <div class="pay-section-title">Payment method</div>
+            <div class="pay-option selected">
+              <div class="pay-option-left"><span class="pay-icon">📱</span> Apple Pay</div>
+              <div class="radio"><div class="radio-inner"></div></div>
+            </div>
+            <div class="pay-option">
+              <div class="pay-option-left"><span class="pay-icon">💳</span> Visa ···4242</div>
+              <div class="radio"></div>
+            </div>
+          </div>
+          <!-- Promo code input (old UX — manual) -->
+          <div style="margin:0 12px 10px;">
+            <div style="font-size:12px;font-weight:700;color:var(--dark);margin-bottom:6px;">Promo code</div>
+            <div style="display:flex;gap:8px;">
+              <div style="flex:1;border:1px solid var(--border);border-radius:10px;padding:9px 12px;font-size:12px;color:#bbb;">Enter coupon code...</div>
+              <div style="background:var(--dark);color:#fff;border-radius:10px;padding:9px 14px;font-size:12px;font-weight:700;cursor:pointer;">Apply</div>
+            </div>
+            <div style="font-size:10px;color:#aaa;margin-top:5px;">* New user coupon: WELCOME10</div>
+          </div>
+          <div class="order-summary">
+            <div class="os-title">Order details</div>
+            <div class="os-row"><span>Order amount</span><span>$50.00</span></div>
+            <div class="os-row"><span style="color:#aaa;">Coupon</span><span style="color:#aaa;">-$10.00</span></div>
+            <div class="os-row total"><span>You pay</span><span>$40.00</span></div>
+          </div>
+          <div style="margin:6px 12px 4px;font-size:11px;color:#5a3fc0;">Click <span style="text-decoration:underline;cursor:pointer;">here</span> to add your email &amp; get a receipt.</div>
+          <!-- Earn bar — same as real app -->
+          <div style="margin:8px 12px 4px;border:1px solid var(--border);border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:center;gap:6px;background:#fff;">
+            <div style="width:18px;height:18px;background:var(--purple);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:800;flex-shrink:0;">S</div>
+            <div style="font-size:13px;font-weight:700;color:var(--purple);">Earn <span style="font-size:15px;">$2.80</span> Snaplii Cash Instantly</div>
+          </div>
+          <button class="pay-btn-final" style="background:#1a1a2e;margin-top:4px;">
+            Pay $40.00 <span class="crossed">$50.00</span>
+          </button>
+        </div>
+
+      </div>
+      <!-- current annotation -->
+      <div class="annotation-panel" id="currentAnnotationPanel">
+        <div class="annotation-card" style="background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.1);">
+          <div class="ann-tag" style="color:rgba(255,255,255,0.3);"><div class="ann-dot" style="background:rgba(255,255,255,0.3);"></div>Current — 问题点</div>
+          <div class="ann-text" style="color:rgba(255,255,255,0.45);">新用户余额显示 <strong style="color:rgba(255,255,255,0.6);">$0.00</strong>，缺乏资产感。$10 奖励以一次性 coupon banner 呈现，用户从未真正"持有"过 Snaplii Cash——无法建立对这个余额体系的信任，也就难以形成后续复购的动力。</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VS divider -->
+    <div class="vs-divider">
+      <div class="vs-line"></div>
+      VS
+      <div class="vs-line"></div>
+    </div>
+
+    <!-- RIGHT: New experience -->
+    <div class="phone-col">
+      <div class="phone-col-label">
+        <div class="lbl-tag new">✦ New experience</div>
+        <div class="lbl-sub">Snaplii Cash 首次转化</div>
+      </div>
+
+      <!-- Step labels -->
+      <div class="step-labels" id="stepLabels">
+        <div class="step-label active" onclick="goToScreen(1)">① 首页</div>
+        <div class="step-label" onclick="goToScreen(2)">② 品牌详情</div>
+        <div class="step-label" onclick="goToScreen(3)">③ 结账</div>
+        <div class="step-label" onclick="goToScreen(4)">④ 成功</div>
+      </div>
+
+      <!-- Phone -->
+      <div class="phone-frame">
+    <div class="notch">
+      <span class="notch-time">13:03</span>
+      <div class="notch-icons">
+        <span>▨▨▨</span>
+        <span>📶</span>
+        <span>🔋</span>
+      </div>
+    </div>
+
+    <!-- SCREEN 1: Home with Snaplii Cash -->
+    <div class="screen active" id="screen1">
+      <div style="flex:1;overflow-y:auto;scrollbar-width:none;" id="screen1scroll">
+      <div class="app-header">
+        <div class="app-topbar">
+          <div class="app-greeting">Hi 👋</div>
+          <div class="balance-chip" onclick="showModal()">
+            <div class="s-dot">S</div>
+            $10.00
+          </div>
+        </div>
+        <div style="font-size:11px;color:#6b5bc0;font-weight:600;margin-bottom:10px;">
+          Your <strong>$10 Snaplii Cash</strong> is ready to use!
+        </div>
+        <div class="search-input">
+          🔍 <span>Search 300+ top brands...</span>
+        </div>
+      </div>
+
+      <!-- Cash spotlight -->
+      <div class="cash-card" onclick="goToScreen(2)">
+        <div class="cash-label">
+          <div class="cash-label-dot"></div>
+          Welcome bonus · ready to spend
+        </div>
+        <div class="cash-amount"><span>$</span>10<span>.00</span></div>
+        <div class="cash-desc">
+          Snaplii Cash · Use on any gift card · <strong>No minimum spend</strong>
+        </div>
+        <div class="cash-actions">
+          <button class="btn-use-now">Use now →</button>
+          <button class="btn-learn" onclick="event.stopPropagation(); showModal()">What's this?</button>
+        </div>
+      </div>
+
+      <!-- Trust strip -->
+      <div class="trust-strip">
+        <div class="trust-item">
+          <div class="trust-num">300+</div>
+          <div class="trust-lbl">Top brands</div>
+        </div>
+        <div class="trust-item">
+          <div class="trust-num">7%</div>
+          <div class="trust-lbl">Max cashback</div>
+        </div>
+        <div class="trust-item">
+          <div class="trust-num">Instant</div>
+          <div class="trust-lbl">Cash credited</div>
+        </div>
+        <div class="trust-item">
+          <div class="trust-num">500K+</div>
+          <div class="trust-lbl">Users</div>
+        </div>
+      </div>
+
+      <!-- Recommended section -->
+      <div class="sec-header">
+        <div class="sec-title">Best to use $10 on</div>
+        <div class="sec-link">See all ›</div>
+      </div>
+      <div class="brand-row">
+        <div class="brand-tile featured" onclick="goToScreen(2)">
+          <div class="best-deal-tag">Best deal</div>
+          <div class="brand-img" style="background:#ff3008;color:#fff;">DOOR<br>DASH</div>
+          <div class="brand-info">
+            <div class="brand-name">DoorDash</div>
+            <div class="brand-earn">7% <span class="old">4%</span></div>
+          </div>
+        </div>
+        <div class="brand-tile" onclick="goToScreen(2)">
+          <div class="brand-img" style="background:#cc0000;color:#fff;font-size:13px;">TARGET</div>
+          <div class="brand-info">
+            <div class="brand-name">Target</div>
+            <div class="brand-earn">2.5%</div>
+          </div>
+        </div>
+        <div class="brand-tile" onclick="goToScreen(2)">
+          <div class="brand-img" style="background:#0064d2;color:#fff;font-size:13px;">eBay</div>
+          <div class="brand-info">
+            <div class="brand-name">eBay</div>
+            <div class="brand-earn">3%</div>
+          </div>
+        </div>
+        <div class="brand-tile" onclick="goToScreen(2)">
+          <div class="brand-img" style="background:#1da462;color:#fff;font-size:11px;">UBER<br>EATS</div>
+          <div class="brand-info">
+            <div class="brand-name">Uber Eats</div>
+            <div class="brand-earn">5%</div>
+          </div>
+        </div>
+        <div class="brand-tile" onclick="goToScreen(2)">
+          <div class="brand-img" style="background:#0061ff;color:#fff;font-size:12px;">BEST<br>BUY</div>
+          <div class="brand-info">
+            <div class="brand-name">Best Buy</div>
+            <div class="brand-earn">2%</div>
+          </div>
+        </div>
+        <div class="brand-tile" onclick="goToScreen(2)">
+          <div class="brand-img" style="background:#f5a623;color:#fff;font-size:11px;">AMAZON</div>
+          <div class="brand-info">
+            <div class="brand-name">Amazon</div>
+            <div class="brand-earn">1.5%</div>
+          </div>
+        </div>
+        <div class="brand-tile" onclick="goToScreen(2)">
+          <div class="brand-img" style="background:#00a651;color:#fff;font-size:12px;">STAR<br>BUCKS</div>
+          <div class="brand-info">
+            <div class="brand-name">Starbucks</div>
+            <div class="brand-earn">4%</div>
+          </div>
+        </div>
+        <div class="brand-tile" onclick="goToScreen(2)">
+          <div class="brand-img" style="background:#702082;color:#fff;font-size:12px;">CADILLAC<br>FAIRVIEW</div>
+          <div class="brand-info">
+            <div class="brand-name">CF Malls</div>
+            <div class="brand-earn">3.5%</div>
+          </div>
+        </div>
+      </div>
+      </div><!-- end screen1scroll -->
+
+      <div class="bottom-nav">
+        <div class="nav-btn active"><div class="nav-icon">🏠</div>Shop</div>
+        <div class="nav-btn"><div class="nav-icon">💳</div>Wallet</div>
+        <div class="nav-btn"><div class="nav-icon">👤</div>Profile</div>
+      </div>
+    </div>
+
+    <!-- SCREEN 2: DoorDash detail -->
+    <div class="screen screen-scroll" id="screen2" style="overflow-y:auto;scrollbar-width:none;">
+      <div class="detail-header">
+        <div class="back-btn" onclick="goToScreen(1)">‹</div>
+        <div class="detail-title">DoorDash</div>
+      </div>
+
+      <div class="gift-card-visual">
+        <div class="gift-card-value">$50</div>
+        <div class="gift-card-logo">DOORDASH</div>
+      </div>
+
+      <div class="amount-options">
+        <div class="amount-label">Select amount</div>
+        <div class="amount-grid">
+          <div class="amount-btn" onclick="selectAmount(this, 20, 4)">
+            <div class="amt">$20</div>
+            <div class="back-pct">4% back</div>
+          </div>
+          <div class="amount-btn" onclick="selectAmount(this, 30, 4)">
+            <div class="amt">$30</div>
+            <div class="back-pct">4% back</div>
+          </div>
+          <div class="amount-btn selected" onclick="selectAmount(this, 50, 7)">
+            <div class="best">Best deal</div>
+            <div class="amt">$50</div>
+            <div class="back-pct">7% back</div>
+          </div>
+          <div class="amount-btn" onclick="selectAmount(this, 100, 7)">
+            <div class="amt">$100</div>
+            <div class="back-pct">7% back</div>
+          </div>
+          <div class="amount-btn" onclick="selectAmount(this, 200, 7)">
+            <div class="amt">$200</div>
+            <div class="back-pct">7% back</div>
+          </div>
+          <div class="amount-btn" style="display:flex;align-items:center;justify-content:center;">
+            <div style="font-size:10px;color:var(--muted);">Custom</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- With cash banner -->
+      <div class="with-cash-banner">
+        <div class="wcb-row">
+          <div class="wcb-left">✨ With your $10 Snaplii Cash</div>
+          <div class="wcb-right" id="withCashPrice">$33.50</div>
+        </div>
+        <div class="wcb-sub" id="withCashSub">Save $10 cash + earn $2.80 back (7%) = net $37.20</div>
+      </div>
+
+      <button class="add-cart-btn" onclick="goToScreen(3)">
+        Buy for $33.50 <span class="orig">$50</span>
+      </button>
+
+      <div style="padding:0 14px 16px;">
+        <div style="font-size:11px;color:var(--muted);text-align:center;line-height:1.6;">
+          ⚡️ Gift card delivered instantly to email<br>
+          🔒 Secure · 🎁 Giftable · 💬 24/7 support
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 3: Checkout -->
+    <div class="screen screen-scroll" id="screen3" style="overflow-y:auto;scrollbar-width:none;">
+      <div class="detail-header">
+        <div class="back-btn" onclick="goToScreen(2)">‹</div>
+        <div class="detail-title">Checkout</div>
+      </div>
+
+      <div class="checkout-card-preview">
+        <div class="gift-card-value">$50</div>
+        <div class="gift-card-logo" style="font-size:18px;font-weight:900;letter-spacing:-1px;">DOORDASH</div>
+      </div>
+
+      <div class="payment-section">
+        <div class="pay-section-title">Payment method</div>
+        <div class="pay-option selected">
+          <div class="pay-option-left">
+            <span class="pay-icon">📱</span> Apple Pay
+            <div class="earn-chip">Earn 7%</div>
+          </div>
+          <div class="radio"><div class="radio-inner"></div></div>
+        </div>
+        <div class="pay-option" onclick="this.previousElementSibling.classList.remove('selected');this.classList.add('selected')">
+          <div class="pay-option-left">
+            <span class="pay-icon">💳</span> Visa ···4242
+          </div>
+          <div class="radio"></div>
+        </div>
+      </div>
+
+      <!-- Snaplii Cash toggle -->
+      <div class="cash-promo-row">
+        <div class="cpr-left">
+          <div class="cpr-title">
+            ✨ Snaplii Cash
+            <span class="applied-tag" id="appliedTag">APPLIED</span>
+          </div>
+          <div class="cpr-sub" id="cashPromoSub">Welcome bonus · expires in 6 days</div>
+        </div>
+        <div class="cpr-right">
+          <div class="cpr-value" id="cashDeductLabel">-$10.00</div>
+          <div class="toggle" id="cashToggle" onclick="toggleCash()"></div>
+        </div>
+      </div>
+
+      <div class="order-summary">
+        <div class="os-title">Order summary</div>
+        <div class="os-row"><span>DoorDash $50 gift card</span><span>$50.00</span></div>
+        <div class="os-row" id="cashRow"><span>Snaplii Cash</span><span class="purple">-$10.00</span></div>
+        <div class="os-row total"><span>You pay</span><span id="finalPayAmount">$40.00</span></div>
+      </div>
+
+      <div class="earn-preview">
+        <div class="ep-left"><div class="ep-dot"></div>You'll earn instantly</div>
+        <div class="ep-amount" id="earnAmount">+$2.80</div>
+      </div>
+
+      <button class="pay-btn-final" onclick="goToScreen(4)">
+        Pay <span id="payBtnAmount">$40.00</span>
+        <span class="crossed" id="payBtnOrig">$50.00</span>
+      </button>
+    </div>
+
+    <!-- SCREEN 4: Success -->
+    <div class="screen" id="screen4">
+      <div class="success-screen">
+        <div class="success-icon">✓</div>
+        <div class="success-title">Order complete! 🎉</div>
+        <div class="success-sub">Your DoorDash $50 gift card<br>is on its way to your email.</div>
+
+        <div class="success-receipt">
+          <div class="receipt-row"><span class="label">Gift card value</span><span class="val">$50.00</span></div>
+          <div class="receipt-row"><span class="label">Snaplii Cash used</span><span class="val purple">-$10.00</span></div>
+          <div class="receipt-row"><span class="label">You paid</span><span class="val">$40.00</span></div>
+          <div class="receipt-row"><span class="label">Cashback earned (7%)</span><span class="val green">+$2.80</span></div>
+          <div class="receipt-row"><span class="label">Net cost</span><span class="val">$37.20</span></div>
+        </div>
+
+        <div class="new-balance-card">
+          <div class="nbc-left">
+            <div class="nbc-label">New Snaplii Cash balance</div>
+            <div class="nbc-amount">$2.80</div>
+            <div class="nbc-earn">Earned from this order · <span>keep earning!</span></div>
+          </div>
+          <div class="nbc-right">💰</div>
+        </div>
+
+        <button class="restart-btn" onclick="goToScreen(1)">Back to shop</button>
+      </div>
+    </div>
+
+  </div><!-- end phone-frame -->
+
+  <!-- Annotation -->
+  <div class="annotation-panel" id="annotationPanel">
+    <div class="annotation-card" id="ann1">
+      <div class="ann-tag"><div class="ann-dot"></div>Growth design · Screen 1</div>
+      <div class="ann-text">
+        <strong>$10 Snaplii Cash 取代 coupon</strong>：注册奖励从"优惠券"升级为"账户余额"——用户看到 balance chip 显示 $10.00，产生<strong>资产感</strong>而非折扣感，回来消费的动力更强。同时推荐最大化使用场景引导首次转化。
+      </div>
+    </div>
+  </div>
+
+    </div><!-- end new phone-col -->
+  </div><!-- end phones-row -->
+
+</div><!-- end stage -->
+
+<!-- Info Modal -->
+<div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">What is Snaplii Cash? 💰</div>
+    <div class="modal-body">Snaplii Cash is real money in your Snaplii account — not a coupon, not points. Use it like cash on any gift card purchase.</div>
+
+    <div class="modal-item">
+      <div class="modal-item-icon">🎁</div>
+      <div class="modal-item-text">
+        <div class="modal-item-title">Welcome bonus</div>
+        <div class="modal-item-sub">You earned $10 just for signing up. No strings attached — use it on any brand.</div>
+      </div>
+    </div>
+    <div class="modal-item">
+      <div class="modal-item-icon">⚡️</div>
+      <div class="modal-item-text">
+        <div class="modal-item-title">Earn more every time</div>
+        <div class="modal-item-sub">Every gift card purchase earns cashback (up to 7%) credited instantly as Snaplii Cash.</div>
+      </div>
+    </div>
+    <div class="modal-item">
+      <div class="modal-item-icon">🔓</div>
+      <div class="modal-item-text">
+        <div class="modal-item-title">No minimum, no expiry stress</div>
+        <div class="modal-item-sub">Use $1 or all $10. Welcome cash expires in 30 days — earned cash never expires.</div>
+      </div>
+    </div>
+
+    <button class="modal-close" onclick="closeModal()">Got it — use my $10 now</button>
+  </div>
+</div>
+
+<script>
+  let currentScreen = 1;
+  let cashApplied = true;
+  let selectedCardAmount = 50;
+  let selectedCashbackPct = 7;
+
+  const annotations = {
+    1: `<div class="ann-tag"><div class="ann-dot"></div>Growth design · Screen 1 — 首页激活</div>
+        <div class="ann-text"><strong>$10 Snaplii Cash 取代 coupon</strong>：注册奖励从"优惠券"升级为"账户余额"——顶部 balance chip 直接显示 $10.00，用户第一眼就感知到自己<strong>持有资产</strong>。更关键的是，首次成功用 Snaplii Cash 完成抵扣，让用户真实体验到"这个余额是真的能用的"，从而建立对 Snaplii Cash 的信任感，为后续 repeat 购买奠定基础。</div>`,
+    2: `<div class="ann-tag"><div class="ann-dot"></div>Growth design · Screen 2 — 品牌详情</div>
+        <div class="ann-text">Amount selector 默认高亮 <strong>$50 + 7% cashback</strong>（最大价值组合），"With Snaplii Cash"横幅实时计算净成本，让用户感知到<strong>组合收益</strong>：cash抵扣 + 未来cashback赚回，降低决策摩擦。</div>`,
+    3: `<div class="ann-tag"><div class="ann-dot"></div>Growth design · Screen 3 — 结账转化</div>
+        <div class="ann-text">Snaplii Cash <strong>默认开启并自动抵扣</strong>，用户无需手动输入 code。实时显示"You'll earn +$2.80 instantly"，让用户在付款前已感知到<strong>下一次的余额</strong>——形成 growth loop 的心理锚点。</div>`,
+    4: `<div class="ann-tag"><div class="ann-dot"></div>Growth design · Screen 4 — 完成留存</div>
+        <div class="ann-text">订单完成页展示 <strong>净成本 $37.20</strong>（花 $37.20 得 $50 价值），新余额 $2.80 显眼呈现。用户完成首次支付后立即知道"下次还有钱用"——<strong>0→1 转化完成，repeat 购买循环启动。</strong></div>`,
+  };
+
+  const currentAnnotations = {
+    1: `<div class="ann-tag" style="color:rgba(255,255,255,0.3);"><div class="ann-dot" style="background:rgba(255,255,255,0.3);"></div>Current — 问题点 · 首页</div><div class="ann-text" style="color:rgba(255,255,255,0.45);">新用户余额显示 <strong style="color:rgba(255,255,255,0.6);">$0.00</strong>，缺乏资产感。$10 奖励以一次性 coupon banner 呈现，用户从未真正"持有"过 Snaplii Cash——无法建立对这个余额体系的信任，也就难以形成后续复购的动力。</div>`,
+    2: `<div class="ann-tag" style="color:rgba(255,255,255,0.3);"><div class="ann-dot" style="background:rgba(255,255,255,0.3);"></div>Current — 问题点 · 品牌详情</div><div class="ann-text" style="color:rgba(255,255,255,0.45);">品牌详情页与 coupon 无关联，用户看不到 $10 如何被使用。新用户仅能感知到"有折扣"，但不知道优惠的来源是 Snaplii Cash，<strong style="color:rgba(255,255,255,0.6);">品牌认知断层</strong>，难以形成"在 Snaplii 消费 = 赚钱"的心智。</div>`,
+    3: `<div class="ann-tag" style="color:rgba(255,255,255,0.3);"><div class="ann-dot" style="background:rgba(255,255,255,0.3);"></div>Current — 问题点 · 结账</div><div class="ann-text" style="color:rgba(255,255,255,0.45);">优惠码需要<strong style="color:rgba(255,255,255,0.6);">手动输入</strong>，增加操作摩擦。订单摘要无法体现 Snaplii Cash 抵扣概念，用户付完钱后仍不清楚"余额是什么"，0→1 信任建立失败。</div>`,
+  };
+
+  function goToCurrentScreen(n) {
+    document.querySelectorAll('[id^="cscreen"]').forEach(s => s.classList.remove('active'));
+    document.getElementById('cscreen' + n).classList.add('active');
+    document.querySelectorAll('#stepLabelsCurrent .step-label').forEach((el, i) => {
+      el.className = 'step-label';
+      if (i + 1 < n) el.classList.add('done');
+      if (i + 1 === n) el.classList.add('active');
+    });
+    document.getElementById('currentAnnotationPanel').innerHTML =
+      `<div class="annotation-card" style="background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.1);">${currentAnnotations[n]}</div>`;
+  }
+
+  function goToScreen(n) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen' + n).classList.add('active');
+
+    document.querySelectorAll('.step-label').forEach((el, i) => {
+      el.className = 'step-label';
+      if (i + 1 < n) el.classList.add('done');
+      if (i + 1 === n) el.classList.add('active');
+    });
+
+    document.getElementById('annotationPanel').innerHTML =
+      `<div class="annotation-card">${annotations[n]}</div>`;
+
+    currentScreen = n;
+  }
+
+  function showModal() {
+    document.getElementById('modal').classList.add('open');
+  }
+  function closeModal() {
+    document.getElementById('modal').classList.remove('open');
+  }
+
+  function selectAmount(el, amount, pct) {
+    document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedCardAmount = amount;
+    selectedCashbackPct = pct;
+
+    const earn = (amount * pct / 100).toFixed(2);
+    const withCash = (amount - 10).toFixed(2);
+    const net = (amount - 10 - parseFloat(earn)).toFixed(2);
+
+    document.getElementById('withCashPrice').textContent = '$' + withCash;
+    document.getElementById('withCashSub').textContent =
+      `Save $10 cash + earn $${earn} back (${pct}%) = net $${net}`;
+
+    document.querySelector('.add-cart-btn').innerHTML =
+      `Buy for $${withCash} <span class="orig">$${amount}</span>`;
+  }
+
+  function toggleCash() {
+    cashApplied = !cashApplied;
+    const toggle = document.getElementById('cashToggle');
+    const cashRow = document.getElementById('cashRow');
+    const appliedTag = document.getElementById('appliedTag');
+    const cashDeductLabel = document.getElementById('cashDeductLabel');
+    const sub = document.getElementById('cashPromoSub');
+    const finalPay = document.getElementById('finalPayAmount');
+    const payBtn = document.getElementById('payBtnAmount');
+    const payBtnOrig = document.getElementById('payBtnOrig');
+    const earn = document.getElementById('earnAmount');
+
+    const amt = selectedCardAmount;
+    const pct = selectedCashbackPct;
+    const earnAmt = (amt * pct / 100).toFixed(2);
+
+    if (cashApplied) {
+      toggle.classList.remove('off');
+      cashRow.style.display = '';
+      appliedTag.style.display = '';
+      cashDeductLabel.textContent = '-$10.00';
+      sub.textContent = 'Welcome bonus · expires in 6 days';
+      finalPay.textContent = '$' + (amt - 10).toFixed(2);
+      payBtn.textContent = '$' + (amt - 10).toFixed(2);
+      payBtnOrig.textContent = '$' + amt.toFixed(2);
+      earn.textContent = '+$' + earnAmt;
+    } else {
+      toggle.classList.add('off');
+      cashRow.style.display = 'none';
+      appliedTag.style.display = 'none';
+      cashDeductLabel.textContent = '$10.00';
+      sub.textContent = 'Tap to apply your $10 welcome cash';
+      finalPay.textContent = '$' + amt.toFixed(2);
+      payBtn.textContent = '$' + amt.toFixed(2);
+      payBtnOrig.style.display = 'none';
+      earn.textContent = '+$' + earnAmt;
+    }
+  }
+</script>
+</body>
+</html>
