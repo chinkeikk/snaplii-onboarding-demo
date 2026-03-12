@@ -1053,13 +1053,13 @@
       <div class="with-cash-banner">
         <div class="wcb-row">
           <div class="wcb-left">✨ With your $10 Snaplii Cash</div>
-          <div class="wcb-right" id="withCashPrice">$33.50</div>
+          <div class="wcb-right" id="withCashPrice">$37.20</div>
         </div>
         <div class="wcb-sub" id="withCashSub">Save $10 cash + earn $2.80 back (7%) = net $37.20</div>
       </div>
 
       <button class="add-cart-btn" onclick="goToScreen(3)">
-        Buy for $33.50 <span class="orig">$50</span>
+        Buy for $37.20 <span class="orig">$50</span>
       </button>
 
       <div style="padding:0 14px 16px;">
@@ -1229,8 +1229,8 @@
 
   const currentAnnotations = {
     1: `<div class="ann-tag" style="color:rgba(255,255,255,0.3);"><div class="ann-dot" style="background:rgba(255,255,255,0.3);"></div>Current — 问题点 · 首页</div><div class="ann-text" style="color:rgba(255,255,255,0.45);">新用户余额显示 <strong style="color:rgba(255,255,255,0.6);">$0.00</strong>，缺乏资产感。$10 奖励以一次性 coupon banner 呈现，用户从未真正"持有"过 Snaplii Cash——无法建立对这个余额体系的信任，也就难以形成后续复购的动力。</div>`,
-    2: `<div class="ann-tag" style="color:rgba(255,255,255,0.3);"><div class="ann-dot" style="background:rgba(255,255,255,0.3);"></div>Current — 问题点 · 品牌详情</div><div class="ann-text" style="color:rgba(255,255,255,0.45);">品牌详情页与 coupon 无关联，用户看不到 $10 如何被使用。新用户仅能感知到"有折扣"，但不知道优惠的来源是 Snaplii Cash，<strong style="color:rgba(255,255,255,0.6);">品牌认知断层</strong>，难以形成"在 Snaplii 消费 = 赚钱"的心智。</div>`,
-    3: `<div class="ann-tag" style="color:rgba(255,255,255,0.3);"><div class="ann-dot" style="background:rgba(255,255,255,0.3);"></div>Current — 问题点 · 结账</div><div class="ann-text" style="color:rgba(255,255,255,0.45);">优惠码需要<strong style="color:rgba(255,255,255,0.6);">手动输入</strong>，增加操作摩擦。订单摘要无法体现 Snaplii Cash 抵扣概念，用户付完钱后仍不清楚"余额是什么"，0→1 信任建立失败。</div>`,
+    2: ``,
+    3: `<div class="ann-tag" style="color:rgba(255,255,255,0.3);"><div class="ann-dot" style="background:rgba(255,255,255,0.3);"></div>Current — 问题点 · 结账</div><div class="ann-text" style="color:rgba(255,255,255,0.45);">用户看到"赚回 $2.80 Snaplii Cash"，却不知道这笔钱会以什么形式到账、存在哪里、下次能不能真正用上——<strong style="color:rgba(255,255,255,0.6);">奖励机制不透明</strong>，在转化临门一脚时产生疑虑，导致信任断裂，路径就此终止。</div>`,
   };
 
   function goToCurrentScreen(n) {
@@ -1246,10 +1246,10 @@
   }
 
   function goToScreen(n) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('[id^="screen"]:not([id^="stepLabels"])').forEach(s => s.classList.remove('active'));
     document.getElementById('screen' + n).classList.add('active');
 
-    document.querySelectorAll('.step-label').forEach((el, i) => {
+    document.querySelectorAll('#stepLabels .step-label').forEach((el, i) => {
       el.className = 'step-label';
       if (i + 1 < n) el.classList.add('done');
       if (i + 1 === n) el.classList.add('active');
@@ -1278,12 +1278,12 @@
     const withCash = (amount - 10).toFixed(2);
     const net = (amount - 10 - parseFloat(earn)).toFixed(2);
 
-    document.getElementById('withCashPrice').textContent = '$' + withCash;
+    document.getElementById('withCashPrice').textContent = '$' + net;
     document.getElementById('withCashSub').textContent =
       `Save $10 cash + earn $${earn} back (${pct}%) = net $${net}`;
 
     document.querySelector('.add-cart-btn').innerHTML =
-      `Buy for $${withCash} <span class="orig">$${amount}</span>`;
+      `Buy for $${net} <span class="orig">$${amount}</span>`;
   }
 
   function toggleCash() {
